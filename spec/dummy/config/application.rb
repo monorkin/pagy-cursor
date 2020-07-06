@@ -3,7 +3,7 @@ require_relative 'boot'
 require 'rails/all'
 
 Bundler.require(*Rails.groups)
-require "pagy_cursor"
+require 'pagy_keyset'
 
 module Dummy
   class Application < Rails::Application

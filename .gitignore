@@ -1,17 +1,28 @@
-/.bundle/
-/.yardoc
-/_yardoc/
+# Test stuff
+/spec/reports/
 /coverage/
 /doc/
-/pkg/
-/spec/reports/
-/tmp/
-
-# rspec failure tracking
+/.yardoc
+/_yardoc/
 .rspec_status
 
+# Dependencies
+/.bundle/
 gemfiles/*.lock
-log
+
+# Logs
+/log
+
+# Databases
 *.sqlite3
 
-spec/dummy/tmp
+# Temp files
+/pkg/
+/tmp/
+/spec/dummy/tmp
+
+# OS and editor artefacts
+.DS_Store
+tags
+tags.*
+*.swap
