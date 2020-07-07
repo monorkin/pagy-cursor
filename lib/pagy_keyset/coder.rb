@@ -8,7 +8,7 @@ require 'pagy_keyset/error'
 module PagyKeyset
   module Coder
     class << self
-      NOUNCE_LENGTH = 8
+      NOUNCE_SEPARATOR = '$'
 
       def encode_cursor(params, secret: nil)
         cursor = params.to_json
@@ -18,6 +18,7 @@ module PagyKeyset
 
       def decode_cursor(cursor, secret: nil)
         return if cursor.nil?
+
         cursor = extract_plain_cursor(Base64.urlsafe_decode64(cursor), secret)
 
         JSON.parse(cursor)
@@ -30,20 +31,21 @@ module PagyKeyset
       def encrypt_cursor(cursor, secret)
         return cursor if secret.nil?
 
-        nounce = SecureRandom.hex(NOUNCE_LENGTH)[0...NOUNCE_LENGTH]
+        nounce = SecureRandom.hex(cursor.length)
         encrypted_cursor = xor_encrypt(cursor, secret)
 
         [
-          xor_encrypt(nounce, secret)[0...NOUNCE_LENGTH],
+          xor_encrypt(nounce, secret),
           xor_encrypt(encrypted_cursor, nounce)
-        ].join('')
+        ].join(NOUNCE_SEPARATOR)
       end
 
       def extract_plain_cursor(cursor, secret)
         return cursor if secret.nil?
 
-        nounce = xor_encrypt(cursor[0...NOUNCE_LENGTH], secret)
-        encrypted_cursor = xor_encrypt(cursor[NOUNCE_LENGTH..-1], nounce)
+        encrypted_nounce, nounce_cursor = cursor.split(NOUNCE_SEPARATOR, 2)
+        nounce = xor_encrypt(encrypted_nounce, secret)
+        encrypted_cursor = xor_encrypt(nounce_cursor, nounce)
         xor_encrypt(encrypted_cursor, secret)
       end
 

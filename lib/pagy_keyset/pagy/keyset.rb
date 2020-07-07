@@ -66,11 +66,9 @@ class Pagy
     end
 
     def more?
-      return false if next_cursor.nil?
-      return false if next_cursor.empty?
+      return false if next_cursor == prev_cursor
 
-      cursor != next_cursor &&
-        cursor != prev_cursor
+      cursor != next_cursor && cursor != prev_cursor
     end
   end
 end
