@@ -138,9 +138,9 @@ A builder is responsible for:
 3. Determining if it can create cursors or build a query for a given collection
 
 These three responsibilities are implemented in the following three methods:
-1. `build_cursors(collection, item_count)`
-2. `build_query(decoded_cursor, collection, item_count, direction)`
-3. `accepts?(collection)`
+1. `build_cursors(collection, item_count)`, returns `{ prev: { ... }, next: { ... } }`
+2. `build_query(decoded_cursor, collection, item_count, direction)`, returns the `collection` with all filters applied
+3. `accepts?(collection)`, returns `true` or `false`
 
 | Argument name    | Type    | Description                                                                               |
 |:-----------------|:--------|:------------------------------------------------------------------------------------------|
@@ -159,6 +159,12 @@ The following configuration variables are read from Pagy:
 | before_page_param | `:before` | Determines which parameter holds the before cursor                                   |
 | after_page_param  | `:after`  | Determines which parameter holds the after cursor                                    |
 | keyset_builders   | `[]`      | Additional builders to be used (this list is prepended to the default builders list) |
+
+Any variable can be set in the following manner:
+
+```ruby
+Pagy::VARS[:keyset_secret] = 'super secret secret'
+```
 
 ## License
 
