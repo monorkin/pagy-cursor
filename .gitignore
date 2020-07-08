@@ -11,8 +11,8 @@
 gemfiles/*.lock
 
 # Logs
-/log
-/spec/dummy/log
+/log/
+/spec/dummy/log/
 
 # Databases
 *.sqlite3

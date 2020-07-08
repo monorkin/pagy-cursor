@@ -7,6 +7,7 @@ module PagyKeyset
   class InvalidCursorError < CursorError; end
   class UnknownDirectionError < CursorError; end
   class EmptyCursorError < CursorError; end
+  class DecryptingAnUnencryptedCursorError < CursorError; end
 
   class WhereClauseBuilderError < Error; end
   class NoBuilderForCollectionError < WhereClauseBuilderError; end

@@ -11,6 +11,8 @@ module PagyKeyset
       NOUNCE_SEPARATOR = '$'
 
       def encode_cursor(params, secret: nil)
+        return unless params
+
         cursor = params.to_json
 
         Base64.urlsafe_encode64(encrypt_cursor(cursor, secret))
@@ -32,21 +34,21 @@ module PagyKeyset
         return cursor if secret.nil?
 
         nounce = SecureRandom.hex(cursor.length)
-        encrypted_cursor = xor_encrypt(cursor, secret)
 
         [
           xor_encrypt(nounce, secret),
-          xor_encrypt(encrypted_cursor, nounce)
+          xor_encrypt(cursor, nounce)
         ].join(NOUNCE_SEPARATOR)
       end
 
       def extract_plain_cursor(cursor, secret)
         return cursor if secret.nil?
 
-        encrypted_nounce, nounce_cursor = cursor.split(NOUNCE_SEPARATOR, 2)
+        encrypted_nounce, encrypted_cursor = cursor.split(NOUNCE_SEPARATOR, 2)
+        raise(DecryptingAnUnencryptedCursorError) if encrypted_cursor.nil?
+
         nounce = xor_encrypt(encrypted_nounce, secret)
-        encrypted_cursor = xor_encrypt(nounce_cursor, nounce)
-        xor_encrypt(encrypted_cursor, secret)
+        xor_encrypt(encrypted_cursor, nounce)
       end
 
       def xor_encrypt(text, secret)

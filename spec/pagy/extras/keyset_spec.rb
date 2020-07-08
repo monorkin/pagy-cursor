@@ -100,4 +100,38 @@ RSpec.describe Pagy::Backend do
       expect(pagy.more?).to eq(true)
     end
   end
+
+  context 'with encrypted cursors' do
+    let(:secret) { 'oreiPhoa2eisohPhieg6iaPh9oof2koh1Vei8Yee6aet0osh5ieheeshh' }
+
+    before do
+      User.destroy_all
+      (1..100).each do |i|
+        User.create!(name: "user#{i}")
+      end
+    end
+
+    it 'paginates with defaults' do
+      pagy, records =
+        backend.send(:pagy_keyset, User.all.order(id: :desc), secret: secret)
+      expect(records.map(&:name)).to eq(
+        ['user100', 'user99', 'user98', 'user97', 'user96',
+         'user95', 'user94', 'user93', 'user92', 'user91',
+         'user90', 'user89', 'user88', 'user87', 'user86',
+         'user85', 'user84', 'user83', 'user82', 'user81'])
+      expect(pagy.more?).to eq(true)
+    end
+
+    it 'paginates with before' do
+      pagy, _ = backend.send(:pagy_keyset, User.all.order(id: :asc), items: 51, secret: secret)
+      pagy, records =
+        backend.send(:pagy_keyset, User.all.order(id: :asc), before: pagy.next, secret: secret)
+      expect(records.map(&:name)).to eq(
+        ['user50', 'user49', 'user48', 'user47', 'user46',
+         'user45', 'user44', 'user43', 'user42', 'user41',
+         'user40', 'user39', 'user38', 'user37', 'user36',
+         'user35', 'user34', 'user33', 'user32', 'user31'])
+      expect(pagy.more?).to eq(true)
+    end
+  end
 end

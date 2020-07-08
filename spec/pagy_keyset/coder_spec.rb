@@ -46,14 +46,24 @@ RSpec.describe PagyKeyset::Coder do
 
         expect(encrypted_nounce_cursor.include?('$')).to eq(true)
 
-        encrypted_nounce, encryped_cursor = encrypted_nounce_cursor.split('$', 2)
+        encrypted_nounce, encrypted_cursor = encrypted_nounce_cursor.split('$', 2)
 
+        cursor_from_encrypted_nounce =
+          PagyKeyset::Coder.send(:xor_encrypt, encrypted_cursor, encrypted_nounce)
+
+        # Using the encrypted nounce shouldn't produce a plaintext cursor
+        expect do
+          JSON.parse(cursor_from_encrypted_nounce)
+        end.to raise_error(Exception)
+
+        # The encrypted nounce shouldn't contain the cursor
         expect do
           JSON.parse(encrypted_nounce)
         end.to raise_error(Exception)
 
+        # The encrypted cursor shouldn't be unencrypted
         expect do
-          JSON.parse(encryped_cursor)
+          JSON.parse(encrypted_cursor)
         end.to raise_error(Exception)
 
         expect(described_class.decode_cursor(subject, secret: secret)).to eq(cursor)
