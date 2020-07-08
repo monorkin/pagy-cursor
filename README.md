@@ -35,8 +35,12 @@ related data, like the current, previous and next cursors.
 ```ruby
 pagy.next
 # => "eyJ1c2Vycy5pZCI6MzUwfQ=="
+
 pagy.prev
 # => "eyJ1c2Vycy5pZCI6MzMxfQ=="
+
+pagy.more?
+# => true
 ```
 
 And the second object is the paginated collection.
