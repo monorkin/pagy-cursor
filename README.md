@@ -149,6 +149,54 @@ These three responsibilities are implemented in the following three methods:
 | `decoded_cursor` | Hash    | A hash of column names and values of the cursor row                                       |
 | `direction`      | Symbol  | Can be `:before` or `:after`. Indicates if a page befor ar after the cursor war requested |
 
+Example:
+
+The following is a builder that only works with arrays that only contain hashes.
+
+```ruby
+module Builders
+  module ArrayOfHashes
+    class << self
+      def accepts?(collection)
+        collection.is_a?(Array) && collection.all? { |row| row.is_a?(Hash) }
+      end
+
+      def build_cursors(collection, _item_count)
+        {
+          prev: collection.first,
+          next: collection.last
+        }
+      end
+
+      def build_query(decoded_cursor, collection, item_count, direction)
+        current_index = collection.index(decoded_cursor)
+
+        if direction == :before
+          from = [0, current_index - item_count].max
+          to = current_index
+        else
+          from = current_index
+          to = current_index + item_count
+        end
+
+        collection[from...to]
+      end
+    end
+  end
+end
+```
+
+The `accept?` method only returns true if the `collection` is an Array and all
+it's elements are Hashes.
+
+`build_cursors` receives the already filtered collection, so we can grab the
+first and last elements from that collection and return them as the previous
+and next cursors (as those elements are Hashes already).
+
+Finally, `build_query` filter the array by finding the index of the element
+that was encoded in the cursor and returning the number of `item_count` elements
+before or after it, depending on the `direction`.
+
 ## Configuration
 
 The following configuration variables are read from Pagy:
