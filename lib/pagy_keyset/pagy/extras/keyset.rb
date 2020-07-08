@@ -15,6 +15,7 @@ class Pagy
       vars[:secret] ||= params[vars[:keyset_secret] || VARS[:keyset_secret]]
       vars[:before] ||= params[vars[:before_page_param] || VARS[:before_page_param]]
       vars[:after] ||= params[vars[:after_page_param] || VARS[:after_page_param]]
+      vars[:keyset_builders] ||= VARS[:keyset_builders]
 
       vars
     end
